@@ -8,7 +8,7 @@ const Layout = () => {
       <Stack.Screen name='chat' options={{ headerShown: false}}/>
       <Stack.Screen name='Home' options={{ headerShown: false}}/>
       <Stack.Screen name='profile' options={{ headerShown: false}}/>
-      <Stack.Screen name='settings' options={{ headerShown: false}}/>
+
     </Stack>
   )
 }
