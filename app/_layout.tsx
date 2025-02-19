@@ -1,7 +1,9 @@
-
-import React, { useEffect } from 'react'
+import React, { useEffect } from "react";
 import { useFonts } from "expo-font";
-import { SplashScreen, Stack } from 'expo-router'
+import { SplashScreen, Stack } from "expo-router";
+import { ClerkProvider, ClerkLoaded } from "@clerk/clerk-expo";
+
+const publishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY!;
 
 const RootLayout = () => {
   const [loaded] = useFonts({
@@ -19,19 +21,26 @@ const RootLayout = () => {
       SplashScreen.hideAsync();
     }
   }, [loaded]);
-
+  if (!publishableKey) {
+    throw new Error(
+      "Missing Publishable Key. Please set EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY in your .env"
+    );
+  }
   if (!loaded) {
     return null;
   }
   return (
-    <Stack>
-      <Stack.Screen name='index' options={{ headerShown: false,}}/>
-      <Stack.Screen name='(root)' options={{ headerShown: false,}}/>
-      <Stack.Screen name='(auth)' options={{ headerShown: false,}}/>
-      <Stack.Screen name='+not-found' />
-
-    </Stack>
-  )
-}
+    <ClerkProvider publishableKey={publishableKey}>
+      <ClerkLoaded>
+        <Stack>
+          <Stack.Screen name="index" options={{ headerShown: false }} />
+          <Stack.Screen name="(root)" options={{ headerShown: false }} />
+          <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+          <Stack.Screen name="+not-found" />
+        </Stack>
+      </ClerkLoaded>
+    </ClerkProvider>
+  );
+};
 
 export default RootLayout;
