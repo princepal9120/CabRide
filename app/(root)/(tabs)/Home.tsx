@@ -2,17 +2,19 @@ import {
   ActivityIndicator,
   FlatList,
   Image,
-  StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
-import React from "react";
-import { Redirect } from "expo-router";
+import React, { useEffect, useState } from "react";
+import * as Location from "expo-location";
 import { SafeAreaView } from "react-native-safe-area-context";
 import RideCard from "@/components/RideCard";
 import { icons, images } from "@/constants";
-import {  useUser } from "@clerk/clerk-expo";
+import { useUser } from "@clerk/clerk-expo";
+import GoogleTextInput from "@/components/GoogleTextInput";
+import Map from "@/components/Map";
+import { useLoactionStore } from "@/store";
 
 const recentRides = [
   {
@@ -122,15 +124,38 @@ const recentRides = [
 ];
 
 const Home = () => {
+  const { setUserLocation, setDestinationLocation } = useLoactionStore();
   const { user } = useUser();
   // console.log(user);
+  const [hasPermissions, setHasPermissions] = useState(false);
 
-
-  
   const loading = true;
-  const handleSignOut =()=>{
+  const handleSignOut = () => {};
+  const handleDestinationPress = () => {};
+  useEffect(() => {
+    const requestLocation = async () => {
+      let { status } = await Location.requestForegroundPermissionsAsync();
 
-  }
+      if (status !== "granted") {
+        setHasPermissions(false);
+        return;
+      }
+
+      let location = await Location.getCurrentPositionAsync();
+      const address = await Location.reverseGeocodeAsync({
+        latitude: location.coords?.latitude!,
+        longitude: location.coords?.longitude!,
+      });
+      setUserLocation({
+        latitude: location.coords?.latitude,
+        longitude: location.coords?.longitude,
+        address: `${address[0].name}, ${address[0].region}`,
+      });
+    };
+
+    requestLocation();
+  }, []);
+
   return (
     <SafeAreaView>
       <FlatList
@@ -166,11 +191,37 @@ const Home = () => {
         ListHeaderComponent={() => (
           <>
             <View className="flex flex-row items-center justify-between my-5">
-              <Text className="text-base font-JakartaBold"> Welcome {user?.firstName || user?.emailAddresses[0].emailAddress} 👋</Text>
-              <TouchableOpacity onPress={handleSignOut}> 
-                <Image source={icons.out} className="w-5 h-5"/>
+              <Text className="text-xl font-JakartaBold capitalize">
+                {" "}
+                Welcome,{" "}
+                {user?.firstName ||
+                  user?.emailAddresses[0].emailAddress.split("@")[0]}{" "}
+                👋
+              </Text>
+              <TouchableOpacity
+                onPress={handleSignOut}
+                className="justify-center items-center w-10 h-10 rounded-full bg-neutral-100"
+              >
+                <Image source={icons.out} className="w-5 h-5" />
               </TouchableOpacity>
             </View>
+
+            <GoogleTextInput
+              icon={icons.search}
+              containerStyle="bg-white shadow-md shadow-neutral-300"
+              handlePress={handleDestinationPress}
+            />
+            <>
+              <Text className="text-xl font-JakartaBold  mb-3">
+                Your Current Location
+              </Text>
+              <View className="flex flex-row items-center bg-transparent h-[300px]">
+                <Map />
+              </View>
+              <Text className="text-xl font-JakartaBold  mb-3">
+                Recnet Rides
+              </Text>
+            </>
           </>
         )}
       />
@@ -179,5 +230,3 @@ const Home = () => {
 };
 
 export default Home;
-
-const styles = StyleSheet.create({});
