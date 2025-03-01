@@ -13,7 +13,6 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-
 import Map from "@/components/Map";
 import RideCard from "@/components/RideCard";
 import { icons, images } from "@/constants";
@@ -77,9 +76,9 @@ const Home = () => {
   return (
     <SafeAreaView className="bg-general-500">
       <FlatList
-        data={recentRides?.slice(0, 5)}
+        data={recentRides?.slice(0, 1)}
         renderItem={({ item }) => <RideCard ride={item} />}
-        keyExtractor={(item, index) => index.toString()}
+      keyExtractor={(item, index) => index.toString()}
         className="px-5"
         keyboardShouldPersistTaps="handled"
         contentContainerStyle={{
@@ -119,7 +118,7 @@ const Home = () => {
             <GoogleTextInput
               icon={icons.search}
               containerStyle="bg-white shadow-md shadow-neutral-300"
-              handlePress={handleDestinationPress}
+              handlePress={handleDestinationPress} 
             />
 
             <>
