@@ -1,6 +1,6 @@
 import { Driver, MarkerData } from "@/types/type";
 
-const directionsAPI = process.env.EXPO_PUBLIC_GOOGLE_API_KEY;
+const directionsAPI = process.env.EXPO_PUBLIC_DIRECTIONS_API_KEY;
 
 export const generateMarkersFromData = ({
   data,
@@ -32,8 +32,8 @@ export const calculateRegion = ({
 }: {
   userLatitude: number | null;
   userLongitude: number | null;
-  destinationLatitude: number | null;
-  destinationLongitude: number | null;
+  destinationLatitude?: number | null;
+  destinationLongitude?: number | null;
 }) => {
   if (!userLatitude || !userLongitude) {
     return {
@@ -52,12 +52,14 @@ export const calculateRegion = ({
       longitudeDelta: 0.01,
     };
   }
+
   const minLat = Math.min(userLatitude, destinationLatitude);
   const maxLat = Math.max(userLatitude, destinationLatitude);
   const minLng = Math.min(userLongitude, destinationLongitude);
   const maxLng = Math.max(userLongitude, destinationLongitude);
-  const latitudeDelta = (maxLat - minLat) * 1.3;
-  const longitudeDelta = (maxLng - minLng) * 1.3;
+
+  const latitudeDelta = (maxLat - minLat) * 1.3; // Adding some padding
+  const longitudeDelta = (maxLng - minLng) * 1.3; // Adding some padding
 
   const latitude = (userLatitude + destinationLatitude) / 2;
   const longitude = (userLongitude + destinationLongitude) / 2;
@@ -90,16 +92,17 @@ export const calculateDriverTimes = async ({
     !destinationLongitude
   )
     return;
+
   try {
     const timesPromises = markers.map(async (marker) => {
       const responseToUser = await fetch(
-        `https://maps.googleapis.com/maps/api/directions/json?origin=${marker.latitude},${marker.longitude}&destination=${userLatitude},${userLongitude}&key=${directionsAPI}`
+        `https://maps.googleapis.com/maps/api/directions/json?origin=${marker.latitude},${marker.longitude}&destination=${userLatitude},${userLongitude}&key=${directionsAPI}`,
       );
       const dataToUser = await responseToUser.json();
       const timeToUser = dataToUser.routes[0].legs[0].duration.value; // Time in seconds
 
       const responseToDestination = await fetch(
-        `https://maps.googleapis.com/maps/api/directions/json?origin=${userLatitude},${userLongitude}&destination=${destinationLatitude},${destinationLongitude}&key=${directionsAPI}`
+        `https://maps.googleapis.com/maps/api/directions/json?origin=${userLatitude},${userLongitude}&destination=${destinationLatitude},${destinationLongitude}&key=${directionsAPI}`,
       );
       const dataToDestination = await responseToDestination.json();
       const timeToDestination =

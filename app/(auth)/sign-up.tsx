@@ -8,8 +8,7 @@ import CustomButton from "@/components/CustomButton";
 import InputField from "@/components/InputField";
 import OAuth from "@/components/OAuth";
 import { icons, images } from "@/constants";
-import { fetchApi } from "@/lib/fetch";
-
+import { fetchAPI } from "@/lib/fetch";
 
 const SignUp = () => {
   const { isLoaded, signUp, setActive } = useSignUp();
@@ -21,7 +20,7 @@ const SignUp = () => {
     password: "",
   });
   const [verification, setVerification] = useState({
-    state: "success",
+    state: "default",
     error: "",
     code: "",
   });
@@ -52,7 +51,7 @@ const SignUp = () => {
         code: verification.code,
       });
       if (completeSignUp.status === "complete") {
-        await fetchApi("/(api)/user", {
+        await fetchAPI("/(api)/user", {
           method: "POST",
           body: JSON.stringify({
             name: form.name,
@@ -85,8 +84,8 @@ const SignUp = () => {
   return (
     <ScrollView className="flex-1 bg-white">
       <View className="flex-1 bg-white">
-        <View className="relative w-full h-[200px]">
-          <Image source={images.signUpCar} className="z-0 w-full h-[200px]" />
+        <View className="relative w-full h-[250px]">
+          <Image source={images.signUpCar} className="z-0 w-full h-[250px]" />
           <Text className="text-2xl text-black font-JakartaSemiBold absolute bottom-5 left-5">
             Create Your Account
           </Text>
@@ -184,7 +183,7 @@ const SignUp = () => {
             </Text>
             <CustomButton
               title="Browse Home"
-              onPress={() => router.push("/(root)/(tabs)/Home")}
+              onPress={() => router.push(`/(root)/(tabs)/home`)}
               className="mt-5"
             />
           </View>
